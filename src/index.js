@@ -1,5 +1,9 @@
 import "dotenv/config";
 
-import helloWorld from "./helloWorld";
+import { convertGsheetsDurationToMoment, displayMomentDuration } from "./util";
 
-console.log(helloWorld());
+const duration = convertGsheetsDurationToMoment(
+  new Date("Sat Dec 30 06:54:00 GMT-08:00 1899"),
+);
+
+console.log(displayMomentDuration(duration));
