@@ -1,7 +1,7 @@
-import { setBedtimeRanges, setStageRanges } from "../params";
+import { getBedtimeRanges, getStageDurations } from "../params";
 
-test("setBedTimeRanges returns the correct bedtime ranges when the optimal start is set to 12:00 AM", () => {
-  const result = setBedtimeRanges(
+test("getBedtimeRanges returns the correct bedtime ranges when the optimal start is set to 12:00 AM", () => {
+  const result = getBedtimeRanges(
     new Date("Sat Dec 30 00:00:00 GMT-08:00 1899"),
   );
   const FORMAT = "HH:mm:ss";
@@ -12,8 +12,8 @@ test("setBedTimeRanges returns the correct bedtime ranges when the optimal start
   expect(result.fairEnd.format(FORMAT)).toBe("03:30:00");
 });
 
-test("setBedTimeRanges returns the correct bedtime ranges when the optimal start is set to 6:00 AM", () => {
-  const result = setBedtimeRanges(
+test("getBedtimeRanges returns the correct bedtime ranges when the optimal start is set to 6:00 AM", () => {
+  const result = getBedtimeRanges(
     new Date("Sat Dec 30 06:00:00 GMT-08:00 1899"),
   );
   const FORMAT = "HH:mm:ss";
@@ -24,8 +24,8 @@ test("setBedTimeRanges returns the correct bedtime ranges when the optimal start
   expect(result.fairEnd.format(FORMAT)).toBe("09:30:00");
 });
 
-test("setStageRanges returns the correct sleep stage target durations for the following parameters: Deep 15%, REM 15%, Optimal time asleep: 6 hours, Fair time asleep: 6 hours", () => {
-  const result = setStageRanges({
+test("getStageDurations returns the correct sleep stage target durations for the following parameters: Deep 15%, REM 15%, Optimal time asleep: 6 hours, Fair time asleep: 6 hours", () => {
+  const result = getStageDurations({
     deepPercent: 15,
     remPercent: 20,
     optimalTimeAsleepMin: 7 * 60,
@@ -38,8 +38,8 @@ test("setStageRanges returns the correct sleep stage target durations for the fo
   expect(result.fairRem.asMinutes()).toBe(72);
 });
 
-test("setStageRanges returns the correct sleep stage target durations for the following parameters: Deep 20%, REM 26%, Optimal time asleep: 8 hours, Fair time asleep: 7 hours", () => {
-  const result = setStageRanges({
+test("getStageDurations returns the correct sleep stage target durations for the following parameters: Deep 20%, REM 26%, Optimal time asleep: 8 hours, Fair time asleep: 7 hours", () => {
+  const result = getStageDurations({
     deepPercent: 20,
     remPercent: 26,
     optimalTimeAsleepMin: 8 * 60,

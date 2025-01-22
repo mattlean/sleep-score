@@ -24,6 +24,17 @@ export const convertGsheetsDurationToMoment = (gsheetsDuration) =>
   });
 
 /**
+ * Convert an array of Dates representing sleep stage durations to Moment.js durations.
+ * This is useful for converting the Dates extracted from Google Sheets into a format
+ * the sleep score calculation can understand.
+ *
+ * @param {Array.<Date>} stageDates An array of Dates representing sleep stage durations
+ * @returns {Array.<moment.Duration>} An array of Moment.js durations representing sleep stage durations
+ */
+export const convertStageDatesToDurations = (stageDates) =>
+  stageDates.map((date) => convertGsheetsDurationToMoment(date));
+
+/**
  * Output Moment.js duration as a string in the Google Sheets duration format
  * @param {moment.Duration} momentDuration A Moment.js duration
  * @returns {string} A string in the Google Sheets duration format
