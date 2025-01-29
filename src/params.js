@@ -1,67 +1,69 @@
 import moment from "moment";
 
+import { createMoment } from "./util";
+
 /**
  * Get the bedtime ranges based off the bedtime goal.
  *
- * @param {Date} bedtimeGoal The excellent bedtime start time from Google Sheets in the form of a Date object
+ * @param {Date} date The sleep session date
+ * @param {Date} bedtimeGoal The bedtime goal on the corresponding date
  * @returns {Object.<string, moment.Moment>} An object that contains the start and end times for early, excellent, and fair bedtime ranges
  */
-export const getBedtimeRanges = (bedtimeGoal) => {
+export const getBedtimeRanges = (date, bedtimeGoal) => {
   const bedtimeRanges = {};
 
-  bedtimeRanges.excellentStart = moment(new Date(bedtimeGoal));
+  bedtimeRanges.excelStart = createMoment(date, bedtimeGoal);
 
-  bedtimeRanges.excellentEnd = bedtimeRanges.excellentStart.clone();
-  bedtimeRanges.excellentEnd.add({ hour: 2, minutes: 45 });
-
-  bedtimeRanges.fairStart = bedtimeRanges.excellentEnd.clone();
-  bedtimeRanges.fairStart.add({ minutes: 1 });
-
-  bedtimeRanges.fairEnd = bedtimeRanges.fairStart.clone();
-  bedtimeRanges.fairEnd.add({ minutes: 44 });
-
-  bedtimeRanges.earlyStart = bedtimeRanges.excellentStart.clone();
+  bedtimeRanges.earlyStart = bedtimeRanges.excelStart.clone();
   bedtimeRanges.earlyStart.subtract({ minutes: 30 });
 
   bedtimeRanges.earlyEnd = bedtimeRanges.earlyStart.clone();
   bedtimeRanges.earlyEnd.add({ minutes: 29 });
 
+  bedtimeRanges.excelEnd = bedtimeRanges.excelStart.clone();
+  bedtimeRanges.excelEnd.add({ hour: 2, minutes: 45 });
+
+  bedtimeRanges.fairStart = bedtimeRanges.excelEnd.clone();
+  bedtimeRanges.fairStart.add({ minutes: 1 });
+
+  bedtimeRanges.fairEnd = bedtimeRanges.fairStart.clone();
+  bedtimeRanges.fairEnd.add({ minutes: 44 });
+
   return bedtimeRanges;
 };
 
 /**
- * Get the target durations for deep and REM stages for efficient and fair sleep.
+ * Get the deep and REM thresholds for excellent and fair sleep.
  *
- * @param {Object} arg Object that contains the target percentages for deep and REM stages and the durations for efficient and fair time asleep
- * @param {number} arg.deepPercent The target percentage for deep sleep
- * @param {number} arg.remPercent The target percentage for REM sleep
- * @param {number} arg.efficientTimeAsleepMin The duration of efficient time asleep in minutes
- * @param {number} arg.fairTimeAsleepMin The duration of fair time asleep in minutes
- * @returns {Object.<string, moment.Duration>} An object that contains the target deep and REM stage durations for efficient and fair sleep
+ * @param {moment.Duration} timeAsleepExcelGoalDuration The minimum threshold for excellent time asleep
+ * @param {moment.Duration} timeAsleepFairGoalDuration The minimum threshold for fair time asleep
+ * @param {moment.Duration} deepPercent The deep sleep percentage goal
+ * @param {moment.Duration} remPercent The REM sleep percentage goal
+ * @returns {Object.<string, moment.Duration>} An object that contains the deep and REM thresholds for excellent and fair sleep
  */
-export const getStageDurations = ({
+export const getStageThresholds = (
+  timeAsleepExcelGoalDuration,
+  timeAsleepFairGoalDuration,
   deepPercent,
   remPercent,
-  efficientTimeAsleepMin,
-  fairTimeAsleepMin,
-}) => {
-  const stageDurations = {};
+) => {
+  const stageThresholds = {};
 
-  stageDurations.efficientDeep = moment.duration({
-    minutes: efficientTimeAsleepMin * (deepPercent * 0.01),
+  stageThresholds.excelDeep = moment.duration({
+    minutes: timeAsleepExcelGoalDuration.asMinutes() * (deepPercent * 0.01),
   });
 
-  stageDurations.efficientRem = moment.duration({
-    minutes: efficientTimeAsleepMin * (remPercent * 0.01),
+  stageThresholds.excelRem = moment.duration({
+    minutes: timeAsleepExcelGoalDuration.asMinutes() * (remPercent * 0.01),
   });
 
-  stageDurations.fairDeep = moment.duration({
-    minutes: fairTimeAsleepMin * (deepPercent * 0.01),
+  stageThresholds.fairDeep = moment.duration({
+    minutes: timeAsleepFairGoalDuration.asMinutes() * (deepPercent * 0.01),
   });
 
-  stageDurations.fairRem = moment.duration({
-    minutes: fairTimeAsleepMin * (remPercent * 0.01),
+  stageThresholds.fairRem = moment.duration({
+    minutes: timeAsleepFairGoalDuration.asMinutes() * (remPercent * 0.01),
   });
 
-  return stageDurations;
+  return stageThresholds;
 };

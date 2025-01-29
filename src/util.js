@@ -7,7 +7,7 @@ import moment from "moment";
  * One limitation is that because the duration is converted into a Date object, any
  * amount of hours that exceeds 23 is lost.
  *
- * For more information:
+ * For more info:
  * https://webapps.stackexchange.com/questions/137061/working-with-durations-in-google-apps-script
  *
  * Another limitation is that Google Sheets does not include the milliseconds portion
@@ -16,7 +16,7 @@ import moment from "moment";
  * @param {Date} date Google Sheets duration in the form of a Date object
  * @returns {moment.Duration} A Moment.js duration
  */
-export const convertGsheetsDurationToMoment = (gsheetsDuration) =>
+export const convertGsheetsDurationToMomentDuration = (gsheetsDuration) =>
   moment.duration({
     hours: gsheetsDuration.getHours(),
     minutes: gsheetsDuration.getMinutes(),
@@ -24,22 +24,52 @@ export const convertGsheetsDurationToMoment = (gsheetsDuration) =>
   });
 
 /**
- * Convert an array of Dates representing sleep stage durations to Moment.js durations.
- * This is useful for converting the Dates extracted from Google Sheets into a format
- * the sleep score calculation can understand.
+ * Convert an array of Google Sheets durations into the form of JavaScript Date objects
+ * to an array of Moment.js durations.
  *
- * @param {Array.<Date>} stageDates An array of Dates representing sleep stage durations
+ * @param {Array.<Date>} gsheetDurations An array of Dates representing sleep stage durations
  * @returns {Array.<moment.Duration>} An array of Moment.js durations representing sleep stage durations
  */
-export const convertStageDatesToDurations = (stageDates) =>
-  stageDates.map((date) => convertGsheetsDurationToMoment(date));
+export const convertGsheetsDurationsToMomentDurations = (gsheetDurations) =>
+  gsheetDurations.map((date) => convertGsheetsDurationToMomentDuration(date));
+
+/**
+ * Create a moment using a date and a generic time that exist on two different Date objects.
+ *
+ * @param {Date} date Date the moment should be on
+ * @param {Date} time Time the moment should be on
+ * @returns {moment.Moment} A moment for the date and time
+ */
+export const createMoment = (date, time) => {
+  return moment({
+    month: date.getMonth(),
+    day: date.getDate(),
+    year: date.getFullYear(),
+    hour: time.getHours(),
+    minute: time.getMinutes(),
+    second: time.getSeconds(),
+  });
+};
+
+/**
+ * Output moment as a string in this format: MM/DD/YY - HH:mm:ss
+ *
+ * For more info: https://momentjs.com/docs/#/displaying/format/
+ *
+ * @param {moment.Moment} momentDatetime A moment
+ * @returns {string} A string that displays the datetime in an easier to read way
+ */
+export const outputMoment = (momentDatetime) => {
+  return momentDatetime.format("MM/DD/YY - HH:mm:ss");
+};
 
 /**
  * Output Moment.js duration as a string in the Google Sheets duration format
+ *
  * @param {moment.Duration} momentDuration A Moment.js duration
  * @returns {string} A string in the Google Sheets duration format
  */
-export const displayMomentDuration = (momentDuration) => {
+export const outputMomentDuration = (momentDuration) => {
   const hours = momentDuration.hours().toString().padStart(2, "0");
   const minutes = momentDuration.minutes().toString().padStart(2, "0");
   const seconds = momentDuration.seconds().toString().padStart(2, "0");

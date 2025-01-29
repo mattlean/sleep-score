@@ -36,7 +36,7 @@ A time asleep meeting or exceeding the fair minimum duration goal, but still und
 
 A time asleep meeting or exceeding the poor minimum duration goal, but still under the fair minimum duration goal would be considered a poor time asleep.
 
-We will use the following fas our time asleep goals for our example:
+We will use the following as our time asleep goals for our example:
 
 | Grade     | Example | Window of Duration |
 | --------- | ------- | ------------------ |
@@ -161,7 +161,7 @@ For our example, that means that $Q = 50$.
 
 When used with Fitbit, if there is no data available for deep and REM sleep, we will assume that the tracker did not track sleep stage data because the time asleep was under 3 hours resulting to $Q = 0$.
 
-## Calculating the Sleep Score
+## Calculating $S$ (Sleep Score)
 
 Now that we have calculated all of the necessary grades, we simply plug them into the formula and put the output score against the following grading scale:
 
@@ -184,5 +184,6 @@ After taking the ceiling of $Q$, we get a sleep score of $81$ which is considere
 
 - Factor in sleep debt like [Whoop](https://support.whoop.com/s/article/WHOOP-Sleep).
 - Punish an excessive amount of days with oversleep (10+ hours).
+- Factor in sleep efficiency: time asleep percentage of total time in bed, and number of sleep sessions.
 - Factor in heart rate like [Fitbit's restoration metric](https://support.google.com/fitbit/answer/14236513?hl=en#zippy=%2Chow-is-my-sleep-score-calculated-in-the-fitbit-app) under quality of sleep.
 - Incorporate elements commonly used in readiness and recovery scores like HRV.
