@@ -8,7 +8,7 @@ import {
 } from "./util";
 
 /**
- * Calculate a sleep score.
+ * Calculate a sleep score for a sleep session.
  *
  * Note that data related to durations are input as a Date object as Apps Script extracts
  * durations as Date objects. For these particular Date objects, any data besides the
@@ -298,113 +298,107 @@ export const calculate = (
 /**
  * Calculate the sleep scores for multiple sleep sessions at once.
  *
- * @param {Array.<Date>} dates An array of session dates
- * @param {Object.<string, moment.Moment>} bedtimeRanges An object that contains the start and end times for early, excellent, and fair bedtime ranges
- * @param {Object.<string, moment.Duration>} stageDurations An object that contains the target deep and REM stage durations for efficient and fair sleep
- * @param {Array.<Date>} bedtimes An array of bedtime metrics. Each item represents a metric for one session.
- * @param {Array.<Date>} timeAsleep An array of time asleep metrics. Each item represents a metric for one session.
- * @param {Array.<moment.Duration>} deep An array of deep sleep metrics. Each item represents a metric for one session.
- * @param {Array.<moment.Duration>} rem An array of REM sleep metrics. Each item represents a metric for one session.
- * @returns {Array.<number>} An array of sleep scores. Each item represents a score for a session.
+ * @param {Array.<Date>} dates An array of dates for sessions
+ * @param {Array.<Date>} bedtimeGoal An array of bedtime goals
+ * @param {Array.<Date>} timeAsleepExcelThresholds An array of thresholds for excellent time asleep
+ * @param {Array.<Date>} timeAsleepFairThresholds An array of thresholds for fair time asleep
+ * @param {Array.<Date>} timeAsleepPoorThresholds An array of thresholds for poor time asleep
+ * @param {Array.<number>} deepGoals An array of deep sleep percentage goals
+ * @param {Array.<number>} remGoals An array of REM sleep percentage goals
+ * @param {Array.<Date>} bedtimes An array of bedtime metrics
+ * @param {Array.<Date>} timesAsleep An array of time asleep metrics
+ * @param {Array.<Date>} deeps An array of deep sleep metrics
+ * @param {Array.<Date>} rems An array of REM sleep metrics
+ * @param {boolean=} showLogs Flag that will show logs in console when set to true
+ * @returns {Array.<number>} An array of sleep scores
  */
 export const calculateAll = (
   dates,
-  bedtimeRanges,
-  stageDurations,
+  bedtimeGoals,
+  timeAsleepExcelThresholds,
+  timeAsleepFairThresholds,
+  timeAsleepPoorThresholds,
+  deepGoals,
+  remGoals,
   bedtimes,
-  timeAsleep,
-  deep,
-  rem,
+  timesAsleep,
+  deeps,
+  rems,
+  showLogs,
 ) => {
   // First output a score of 0 for cases where sleep did not occur
-  if (!dates && !bedtimes && !timeAsleep && !deep && !rem) {
+  if (
+    !dates &&
+    !bedtimeGoals &&
+    !timeAsleepExcelThresholds &&
+    !timeAsleepFairThresholds &&
+    !timeAsleepPoorThresholds &&
+    !deepGoals &&
+    !remGoals &&
+    !bedtimes &&
+    !timesAsleep &&
+    !deeps &&
+    !rems
+  ) {
     return 0;
   }
 
   if (
     dates.length == 0 &&
     bedtimes.length === 0 &&
-    timeAsleep.length === 0 &&
-    deep.length === 0 &&
-    rem.length === 0
+    timeAsleepExcelThresholds.length === 0 &&
+    timeAsleepFairThresholds.length === 0 &&
+    timeAsleepPoorThresholds.length === 0 &&
+    deepGoals.length === 0 &&
+    remGoals.length === 0 &&
+    bedtimes.length === 0 &&
+    timesAsleep.length === 0 &&
+    deeps.length === 0 &&
+    rems.length === 0
   ) {
     return 0;
   }
 
   // Handle error with input data format
   if (
-    bedtimes.length !== dates.length ||
-    bedtimes.length !== timeAsleep.length ||
-    (bedtimes.length !== deep.length && bedtimes.length !== rem.length)
+    dates.length !== bedtimes.length &&
+    dates.length !== timeAsleepExcelThresholds.length &&
+    dates.length !== timeAsleepFairThresholds.length &&
+    dates.length !== timeAsleepPoorThresholds.length &&
+    dates.length !== deepGoals.length &&
+    dates.length !== remGoals.length &&
+    dates.length !== bedtimes.length &&
+    dates.length !== timesAsleep.length &&
+    dates.length !== deeps.length &&
+    dates.length !== rems.length
   ) {
-    throw new Error(
-      "Metric arrays do not match in size. Make sure all the data for metrics are the same size.",
-    );
+    throw new Error("Parameter arrays do not match in size.");
   }
 
-  const { earlyStart, earlyEnd, excelStart, excelEnd, fairStart, fairEnd } =
-    bedtimeRanges;
+  if (showLogs) {
+    Logger.info(`Calculating ${dates.length} scores...`);
+  }
 
-  const FORMAT = "HH:mm:ss";
+  const scores = [];
 
-  console.log(
-    earlyStart.format(FORMAT),
-    earlyEnd.format(FORMAT),
-    excelStart.format(FORMAT),
-    excelEnd.format(FORMAT),
-    fairStart.format(FORMAT),
-    fairEnd.format(FORMAT),
-  );
+  dates.forEach((_, i) => {
+    scores.push(
+      calculate(
+        dates[i],
+        bedtimeGoals[i],
+        timeAsleepExcelThresholds[i],
+        timeAsleepFairThresholds[i],
+        timeAsleepPoorThresholds[i],
+        deepGoals[i],
+        remGoals[i],
+        bedtimes[i],
+        timesAsleep[i],
+        deeps[i],
+        rems[i],
+        showLogs,
+      ),
+    );
+  });
 
-  const { efficientDeep, efficientRem, fairDeepThreshold, fairRemThreshold } =
-    stageDurations;
-
-  console.log(
-    efficientDeep.format(FORMAT),
-    efficientRem.format(FORMAT),
-    fairDeepThreshold.format(FORMAT),
-    fairRemThreshold.format(FORMAT),
-  );
-  // if (!colB) {
-  //   throw new Error("Column for bedtime was not set.");
-  // }
-
-  // Logger.info("colB");
-
-  // const dataB = sheetResult.getRange(colB).getValues();
-  // for (var i = 0; i < dataB.length; ++i) {
-  //   Logger.log(dataB[i][0]);
-  // }
-
-  // if (!colA) {
-  //   throw new Error("Column for time asleep was not set.");
-  // }
-
-  // Logger.info("colA");
-
-  // const dataA = sheetResult.getRange(colA).getValues();
-  // for (var i = 0; i < dataA.length; ++i) {
-  //   Logger.log(dataA[i][0].toISOString());
-  // }
-
-  // if (!colDeep) {
-  //   throw new Error("Column for deep sleep was not set.");
-  // }
-
-  // if (!colRem) {
-  //   throw new Error("Column for REM sleep was not set.");
-  // }
-
-  // var sheetResult = SpreadsheetApp.getActiveSpreadsheet();
-
-  // var data = sheetResult.getDataRange().getValues();
-
-  // Logger.log(data[0][0]);
-  // Logger.log(sheetResult.getRange("A1:A11").getValues());
-  // // sheet.getRange('A1').setValue('monthya');
-
-  // // var foo = sheet.getRange('A1:B2');
-  // // Logger.log(foo.getValues());
-  // // var bar = sheet.getActiveRange();
-  // // Logger.log(bar);
+  return scores;
 };
