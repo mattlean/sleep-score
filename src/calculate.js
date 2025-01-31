@@ -8,29 +8,34 @@ import {
 } from "./util";
 
 /**
+ * Calculate a sleep score.
  *
- * @param {Date} date
- * @param {Date} bedtimeGoal
- * @param {Date} timeAsleepExcelGoal
- * @param {Date} timeAsleepFairGoal
- * @param {Date} timeAsleepPoorGoal
- * @param {number} deepPercent
- * @param {number} remPercent
- * @param {Date} bedtime
- * @param {Date} timeAsleep
- * @param {Date} deep
- * @param {Date} rem
- * @param {boolean=} showLogs
- * @returns
+ * Note that data related to durations are input as a Date object as Apps Script extracts
+ * durations as Date objects. For these particular Date objects, any data besides the
+ * hours, minutes, and seconds can be safely ignored.
+ *
+ * @param {Date} date Date for the session
+ * @param {Date} bedtimeGoal Bedtime goal
+ * @param {Date} timeAsleepExcelThreshold Threshold for excellent time asleep
+ * @param {Date} timeAsleepFairThreshold Threshold for fair time asleep
+ * @param {Date} timeAsleepPoorThreshold Threshold for poor time asleep
+ * @param {number} deepGoal Deep sleep percentage goal
+ * @param {number} remGoal REM sleep percentage goal
+ * @param {Date} bedtime Bedtime metric
+ * @param {Date} timeAsleep Time asleep metric
+ * @param {Date} deep Deep sleep metric
+ * @param {Date} rem REM sleep metric
+ * @param {boolean=} showLogs Flag that will show logs in console when set to true
+ * @returns {number} A sleep score.
  */
 export const calculate = (
   date,
   bedtimeGoal,
-  timeAsleepExcelGoal,
-  timeAsleepFairGoal,
-  timeAsleepPoorGoal,
-  deepPercent,
-  remPercent,
+  timeAsleepExcelThreshold,
+  timeAsleepFairThreshold,
+  timeAsleepPoorThreshold,
+  deepGoal,
+  remGoal,
   bedtime,
   timeAsleep,
   deep,
@@ -45,23 +50,23 @@ export const calculate = (
     throw new Error("Bedtime goal was not found.");
   }
 
-  if (!timeAsleepExcelGoal) {
+  if (!timeAsleepExcelThreshold) {
     throw new Error("Excellent time asleep minimum was not found.");
   }
 
-  if (!timeAsleepFairGoal) {
+  if (!timeAsleepFairThreshold) {
     throw new Error("Fair time asleep minimum was not found.");
   }
 
-  if (!timeAsleepPoorGoal) {
+  if (!timeAsleepPoorThreshold) {
     throw new Error("Poor time asleep minimum was not found.");
   }
 
-  if (!deepPercent) {
+  if (!deepGoal) {
     throw new Error("Deep sleep percentage goal was not found.");
   }
 
-  if (!remPercent) {
+  if (!remGoal) {
     throw new Error("REM sleep percentage goal was not found.");
   }
 
@@ -82,12 +87,12 @@ export const calculate = (
   }
 
   const timeAsleepDuration = convertGsheetsDurationToMomentDuration(timeAsleep);
-  const timeAsleepExcelGoalDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepExcelGoal);
-  const timeAsleepFairGoalDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepFairGoal);
-  const timeAsleepPoorGoalDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepPoorGoal);
+  const timeAsleepExcelThresholdDuration =
+    convertGsheetsDurationToMomentDuration(timeAsleepExcelThreshold);
+  const timeAsleepFairThresholdDuration =
+    convertGsheetsDurationToMomentDuration(timeAsleepFairThreshold);
+  const timeAsleepPoorThresholdDuration =
+    convertGsheetsDurationToMomentDuration(timeAsleepPoorThreshold);
   const deepDuration = convertGsheetsDurationToMomentDuration(deep);
   const remDuration = convertGsheetsDurationToMomentDuration(rem);
 
@@ -96,16 +101,16 @@ export const calculate = (
     Logger.info(`Date: ${date}`);
     Logger.info(`Bedtime Goal: ${bedtimeGoal}`);
     Logger.info(
-      `Time Asleep Excellent Goal: ${timeAsleepExcelGoal} (${outputMomentDuration(timeAsleepExcelGoalDuration)})`,
+      `Time Asleep Excellent Goal: ${timeAsleepExcelThreshold} (${outputMomentDuration(timeAsleepExcelThresholdDuration)})`,
     );
     Logger.info(
-      `Time Asleep Fair Goal: ${timeAsleepFairGoal} (${outputMomentDuration(timeAsleepFairGoalDuration)})`,
+      `Time Asleep Fair Goal: ${timeAsleepFairThreshold} (${outputMomentDuration(timeAsleepFairThresholdDuration)})`,
     );
     Logger.info(
-      `Time Asleep Poor Goal: ${timeAsleepPoorGoal} (${outputMomentDuration(timeAsleepPoorGoalDuration)})`,
+      `Time Asleep Poor Goal: ${timeAsleepPoorThreshold} (${outputMomentDuration(timeAsleepPoorThresholdDuration)})`,
     );
-    Logger.info(`Deep % Goal: ${deepPercent}`);
-    Logger.info(`REM % Goal: ${remPercent}`);
+    Logger.info(`Deep % Goal: ${deepGoal}`);
+    Logger.info(`REM % Goal: ${remGoal}`);
 
     Logger.info("[ METRIC PARAMS ]");
     Logger.info(`Bedtime: ${bedtime}`);
@@ -132,23 +137,28 @@ export const calculate = (
     Logger.info(outputMoment(fairEnd));
   }
 
-  const { excelDeep, excelRem, fairDeep, fairRem } = getStageThresholds(
-    timeAsleepExcelGoalDuration,
-    timeAsleepFairGoalDuration,
-    deepPercent,
-    remPercent,
+  const {
+    excelDeepThreshold,
+    excelRemThreshold,
+    fairDeepThreshold,
+    fairRemThreshold,
+  } = getStageThresholds(
+    timeAsleepExcelThresholdDuration,
+    timeAsleepFairThresholdDuration,
+    deepGoal,
+    remGoal,
   );
 
   if (showLogs) {
     Logger.info("[ STAGE THRESHOLDS ]");
     Logger.info("Excellent deep:");
-    Logger.info(outputMomentDuration(excelDeep));
+    Logger.info(outputMomentDuration(excelDeepThreshold));
     Logger.info("Excellent REM:");
-    Logger.info(outputMomentDuration(excelRem));
+    Logger.info(outputMomentDuration(excelRemThreshold));
     Logger.info("Fair deep:");
-    Logger.info(outputMomentDuration(fairDeep));
+    Logger.info(outputMomentDuration(fairDeepThreshold));
     Logger.info("Fair REM:");
-    Logger.info(outputMomentDuration(fairRem));
+    Logger.info(outputMomentDuration(fairRemThreshold));
   }
 
   /* Grading T (Bedtime Grade) */
@@ -192,17 +202,17 @@ export const calculate = (
 
   let D = 0;
 
-  if (timeAsleepDuration >= timeAsleepExcelGoalDuration) {
+  if (timeAsleepDuration >= timeAsleepExcelThresholdDuration) {
     if (showLogs) {
       Logger.info("Excellent time asleep: +100");
     }
     D = 100;
-  } else if (timeAsleepDuration >= timeAsleepFairGoalDuration) {
+  } else if (timeAsleepDuration >= timeAsleepFairThresholdDuration) {
     if (showLogs) {
       Logger.info("Fair time asleep: +70");
     }
     D = 70;
-  } else if (timeAsleepDuration >= timeAsleepPoorGoalDuration) {
+  } else if (timeAsleepDuration >= timeAsleepPoorThresholdDuration) {
     if (showLogs) {
       Logger.info("Poor time asleep: +60");
     }
@@ -227,12 +237,12 @@ export const calculate = (
 
   let d = 0;
 
-  if (deepDuration >= excelDeep) {
+  if (deepDuration >= excelDeepThreshold) {
     if (showLogs) {
       Logger.info("Excellent deep sleep: +50");
     }
     d += 50;
-  } else if (deepDuration >= fairDeep) {
+  } else if (deepDuration >= fairDeepThreshold) {
     if (showLogs) {
       Logger.info("Fair deep sleep: +40");
     }
@@ -246,12 +256,12 @@ export const calculate = (
 
   let r = 0;
 
-  if (remDuration >= excelRem) {
+  if (remDuration >= excelRemThreshold) {
     if (showLogs) {
       Logger.info("Excellent REM sleep: +50");
     }
     r += 50;
-  } else if (remDuration >= fairRem) {
+  } else if (remDuration >= fairRemThreshold) {
     if (showLogs) {
       Logger.info("Fair REM sleep: +40");
     }
@@ -266,6 +276,7 @@ export const calculate = (
   Q = d + r;
 
   if (showLogs) {
+    Logger.info(`${d} + ${r}`);
     Logger.info(`Q = ${Q}`);
   }
 
@@ -277,6 +288,7 @@ export const calculate = (
   const S = (T * 0.6 + D * 0.4) * 0.8 + Q * 0.2;
 
   if (showLogs) {
+    Logger.info(`(${T} * 0.6 + ${D} * 0.4) * 0.8 + ${Q} * 0.2`);
     Logger.info(`S = ${S}`);
   }
 
@@ -344,13 +356,14 @@ export const calculateAll = (
     fairEnd.format(FORMAT),
   );
 
-  const { efficientDeep, efficientRem, fairDeep, fairRem } = stageDurations;
+  const { efficientDeep, efficientRem, fairDeepThreshold, fairRemThreshold } =
+    stageDurations;
 
   console.log(
     efficientDeep.format(FORMAT),
     efficientRem.format(FORMAT),
-    fairDeep.format(FORMAT),
-    fairRem.format(FORMAT),
+    fairDeepThreshold.format(FORMAT),
+    fairRemThreshold.format(FORMAT),
   );
   // if (!colB) {
   //   throw new Error("Column for bedtime was not set.");

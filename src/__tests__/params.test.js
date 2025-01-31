@@ -56,10 +56,10 @@ describe("getStageThresholds", () => {
       20,
     );
 
-    expect(result.excelDeep.asMinutes()).toBe(81);
-    expect(result.excelRem.asMinutes()).toBe(108);
-    expect(result.fairDeep.asMinutes()).toBe(63);
-    expect(result.fairRem.asMinutes()).toBe(84);
+    expect(result.excelDeepThreshold.asMinutes()).toBe(81);
+    expect(result.excelRemThreshold.asMinutes()).toBe(108);
+    expect(result.fairDeepThreshold.asMinutes()).toBe(63);
+    expect(result.fairRemThreshold.asMinutes()).toBe(84);
   });
 
   it("returns the correct sleep stage target durations for the following parameters: Deep 15%, REM 15%, excel time asleep: 6 hours, Fair time asleep: 6 hours", () => {
@@ -70,10 +70,10 @@ describe("getStageThresholds", () => {
       20,
     );
 
-    expect(result.excelDeep.asMinutes()).toBe(63);
-    expect(result.excelRem.asMinutes()).toBe(84);
-    expect(result.fairDeep.asMinutes()).toBe(54);
-    expect(result.fairRem.asMinutes()).toBe(72);
+    expect(result.excelDeepThreshold.asMinutes()).toBe(63);
+    expect(result.excelRemThreshold.asMinutes()).toBe(84);
+    expect(result.fairDeepThreshold.asMinutes()).toBe(54);
+    expect(result.fairRemThreshold.asMinutes()).toBe(72);
   });
 
   it("returns the correct sleep stage target durations for the following parameters: Deep 20%, REM 26%, excel time asleep: 8 hours, Fair time asleep: 7 hours", () => {
@@ -84,9 +84,9 @@ describe("getStageThresholds", () => {
       26,
     );
 
-    expect(result.excelDeep.asMinutes()).toBe(96);
-    expect(Math.floor(result.excelRem.asMinutes())).toBe(124);
-    expect(result.fairDeep.asMinutes()).toBe(84);
-    expect(Math.floor(result.fairRem.asMinutes())).toBe(109);
+    expect(result.excelDeepThreshold.asMinutes()).toBe(96);
+    expect(Math.floor(result.excelRemThreshold.asMinutes())).toBe(124);
+    expect(result.fairDeepThreshold.asMinutes()).toBe(84);
+    expect(Math.floor(result.fairRemThreshold.asMinutes())).toBe(109);
   });
 });

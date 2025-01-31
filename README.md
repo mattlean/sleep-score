@@ -8,13 +8,13 @@ This algorithm uses data collected by a sleep tracking device to calculate sleep
 
 Fitbit already has a sleep score feature that works well for most people, but I find it a bit too generous for my scenario, although that makes sense since it needs to work for extremely large demographic.
 
-Unfortunately I don't have what is considered to be a normal sleep pattern, so I need a sleep score that follows a stricter ruleset but can also be adjusted. This score may potentially stress out some people, but I am usually not negatively stressed by bad health metrics, and I personally feel more motivated to improve when I understand them.
+Unfortunately I don't currently have what is considered to be a normal sleep pattern, so I need a sleep score that follows a stricter ruleset but can also be adjusted each time it is run. This score may potentially stress out some people, but I am usually not negatively stressed by bad health metrics, and I personally feel more motivated to improve when I understand them.
 
 # Calculation
 
 ## Parameters
 
-### Define the Goals
+### Define Initial Parameters
 
 The goals act as the initial parameters for the calculation.
 
@@ -22,19 +22,19 @@ The goals act as the initial parameters for the calculation.
 
 Set the earliest possible bedtime that would be considered excellent for your goals. This time is referred to as the **bedtime goal**.
 
-The algorithm will use this bedtime goal to generate ranges of time that will be used to grade the bedtimes we have. The closer the bedtime is to the bedtime goal, the better grade we will get.
+The algorithm will use this bedtime goal to generate ranges of time that will be used to grade the bedtimes we have. Generally speaking, the closer the bedtime is to the bedtime goal, the better grade we will get.
 
 We will use 9:00 PM as the bedtime goal for our example scenario.
 
-#### Time Asleep Goals
+#### Time Asleep Thresholds
 
-Set the minimum duration goals for the excellent, fair, and poor time asleep.
+Set the minimum thresholds for the excellent, fair, and poor time asleep.
 
-A time asleep meeting or exceeding the excellent minimum duration goal would be considered an excellent time asleep.
+A time asleep meeting or exceeding the excellent threshold is considered an excellent time asleep.
 
-A time asleep meeting or exceeding the fair minimum duration goal, but still under the excellent minimum duration goal would be considered a fair time asleep.
+A time asleep meeting or exceeding the fair threshold, but is still under the excellent threshold is considered a fair time asleep.
 
-A time asleep meeting or exceeding the poor minimum duration goal, but still under the fair minimum duration goal would be considered a poor time asleep.
+A time asleep meeting or exceeding the poor threshold, but is still under the fair threshold is considered a poor time asleep.
 
 We will use the following as our time asleep goals for our example:
 
@@ -44,7 +44,7 @@ We will use the following as our time asleep goals for our example:
 | Fair      | 7 hours | 7:00 – 8:59        |
 | Poor      | 3 hours | 3:00 – 6:59        |
 
-Note that we reasoned to use 3 hours as the minimum duration goal for the poor grade because Fitbit does not track sleep stages when the time asleep is under 3 hours for a session.
+Note that we reasoned to use 3 hours as the threshold for the poor grade because Fitbit does not track sleep stages when the time asleep for a session is under 3 hours.
 
 #### Deep Sleep Percentage Goal
 
@@ -58,11 +58,11 @@ Set the minimum percentage of REM sleep for each session that would be considere
 
 We'll use 20% for this example.
 
-### Sleep Metrics
+### Record Sleep Metric Parameters
 
 Now that we have our goals defined, all we need to do is sleep and gather metrics for a session.
 
-These are the actual measurements taken from a particular sleep session that will be evaluated against your goals:
+These are the actual measurements taken from a particular sleep session that will be evaluated:
 
 - **Bedtime**: When you feel asleep
 - **Time asleep**: How long you stayed asleep
@@ -71,7 +71,7 @@ These are the actual measurements taken from a particular sleep session that wil
 
 ## Formula
 
-Now that we have both our goals set and our sleep metrics gathered, we can start the calculation for a score by using this formula:
+Now that we have both our initial and sleep metric parameters ready, we can start the calculation for a sleep score by working through this formula:
 
 $$\left\lceil S \right\rceil = (T \times 0.6 + D \times 0.4) \times 0.8 + Q \times 0.2$$
 
@@ -95,9 +95,9 @@ _The maximum amount of possible points earned is 100._
 
 ## Grading $D$ (Time Asleep Grade)
 
-$D$ represents the **time asleep grade** which uses the time asleep metric from the given sleep session and evaluates it against your time asleep goals.
+$D$ represents the **time asleep grade** which uses the time asleep metric from the given sleep session and evaluates it against your time asleep thresholds.
 
-Let's say our time asleep metric is 7 hours and grade it against our time asleep goals:
+Let's say our time asleep metric is 7 hours and grade it against our previously defined thresholds:
 
 | Grade     | Goal Example | Window of Duration | Points |
 | --------- | ------------ | ------------------ | ------ |
@@ -113,15 +113,15 @@ _The maximum amount of possible points earned is 100._
 
 ## Grading $Q$ (Quality of Sleep Grade)
 
-$Q$ represents the **quality of sleep grade** which uses the deep and REM sleep metrics from the given sleep session and evaluates it against grading ranges generated from your deep and REM sleep percentage goals.
+$Q$ represents the **quality of sleep grade** which uses the deep and REM sleep metrics from the given sleep session and evaluates it against thresholds generated from your deep and REM sleep percentage goals.
 
 Before we can calculate $Q$, we need to grade deep and REM sleep as $d$ and $r$ respectively.
 
 ### Grading $d$ (Deep Sleep Grade)
 
-When the deep sleep goal percentage is 15%, 15% of the minimum duration for the excellent time asleep determines the minimum duration excellent deep sleep. The same methodology is used with the fair time asleep duration to determine the minimum duration for fair deep sleep.
+When the deep sleep goal percentage is 15%, 15% of excellent time asleep determines the threshold for excellent deep sleep. 15% of fair time asleep determines the threshold for fair deep sleep.
 
-Let's say our deep sleep metric is 1 hour and grade it against these grading ranges:
+Let's say our deep sleep metric is 1 hour and grade it against thresholds generated using 15%:
 
 | Grade     | Window Duration | Points |
 | --------- | --------------- | ------ |
@@ -136,9 +136,9 @@ _The maximum amount of possible points earned is 50._
 
 ### Grading $r$ (REM Sleep Grade)
 
-When the REM sleep goal percentage is 20%, 20% of the minimum duration for the excellent time asleep determines the minimum duration excellent REM sleep. The same methodology is used with the fair time asleep duration to determine the minimum duration for fair REM sleep.
+When the REM sleep goal percentage is 20%, 20% of excellent time asleep determines the threshold for excellent REM sleep. 20% of fair time asleep determines the threshold for fair REM sleep.
 
-Let's say our REM sleep metric is 1.5 houra and grade it against these grading ranges:
+Let's say our REM sleep metric is 1.5 hours and grade it against thresholds generated using 20%:
 
 | Grade     | Window Duration | Points |
 | --------- | --------------- | ------ |
@@ -163,7 +163,7 @@ When used with Fitbit, if there is no data available for deep and REM sleep, we 
 
 ## Calculating $S$ (Sleep Score)
 
-Now that we have calculated all of the necessary grades, we simply plug them into the formula and put the output score against the following grading scale:
+Now that we have calculated all of the necessary grades, we simply plug them into the formula and compare $S$ against the following grading scale:
 
 | Grade     | Score Range |
 | --------- | ----------- |

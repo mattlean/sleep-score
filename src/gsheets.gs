@@ -3,28 +3,28 @@
 /**
  * Extract data from a Google Sheets spreadsheet.
  *
- * @param {string} sheetNameParams The name of the sheet that contains the parameters for the sleep score algorithm
- * @param {string} colDate A range for the date column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colBedtimeGoal A range for the bedtime goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colTimeAsleepExcelGoal A range for the time asleep excellent goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colTimeAsleepFairGoal A range for the time asleep fair goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colTimeAsleepPoorGoal A range for the time asleep poor goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colDeepGoal A range for the deep sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colRemGoal A range for the REM sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} sheetNameParams Name of the sheet that contains the parameters for the sleep score algorithm
+ * @param {string} colDate Range for the date column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colBedtimeGoal Range for the bedtime goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colTimeAsleepExcelThreshold Range for the time asleep excellent threshold column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colTimeAsleepFairThreshold Range for the time asleep fair threshold column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colTimeAsleepPoorThreshold Range for the time asleep poor threshold column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colDeepGoal Range for the deep sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colRemGoal Range for the REM sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {string} sheetNameResult The name of the sheet that contains the results
- * @param {string} colBedtime A range for the bedtime column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colTimeAsleep A range for the time asleep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colDeep A range for the deep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} colRem A range for the REM column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colBedtime Range for the bedtime column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colTimeAsleep Range for the time asleep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colDeep Range for the deep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {string} colRem Range for the REM column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @returns {Object.<string, Date|number>} An object that contains the spreadsheet data
  */
 const extractData = (
   sheetNameParams,
   colDate,
   colBedtimeGoal,
-  colTimeAsleepExcelGoal,
-  colTimeAsleepFairGoal,
-  colTimeAsleepPoorGoal,
+  colTimeAsleepExcelThreshold,
+  colTimeAsleepFairThreshold,
+  colTimeAsleepPoorThreshold,
   colDeepGoal,
   colRemGoal,
   sheetNameResult,
@@ -45,15 +45,15 @@ const extractData = (
     throw new Error("Column for bedtime goal was not set.");
   }
 
-  if (!colTimeAsleepExcelGoal) {
+  if (!colTimeAsleepExcelThreshold) {
     throw new Error("Column for time asleep excellent minimum was not set.");
   }
 
-  if (!colTimeAsleepFairGoal) {
+  if (!colTimeAsleepFairThreshold) {
     throw new Error("Column for time asleep fair minimum was not set.");
   }
 
-  if (!colTimeAsleepPoorGoal) {
+  if (!colTimeAsleepPoorThreshold) {
     throw new Error("Column for time asleep poor minimum was not set.");
   }
 
@@ -101,16 +101,16 @@ const extractData = (
 
   data.dates = sheetParams.getRange(colDate).getValues().flat();
   data.bedtimeGoals = sheetParams.getRange(colBedtimeGoal).getValues().flat();
-  data.timeAsleepExcelGoals = sheetParams
-    .getRange(colTimeAsleepExcelGoal)
+  data.timeAsleepExcelThresholds = sheetParams
+    .getRange(colTimeAsleepExcelThreshold)
     .getValues()
     .flat();
-  data.timeAsleepFairGoals = sheetParams
-    .getRange(colTimeAsleepFairGoal)
+  data.timeAsleepFairThresholds = sheetParams
+    .getRange(colTimeAsleepFairThreshold)
     .getValues()
     .flat();
-  data.timeAsleepPoorGoals = sheetParams
-    .getRange(colTimeAsleepPoorGoal)
+  data.timeAsleepPoorThresholds = sheetParams
+    .getRange(colTimeAsleepPoorThreshold)
     .getValues()
     .flat();
   data.deepGoals = sheetParams.getRange(colDeepGoal).getValues().flat();
@@ -123,34 +123,12 @@ const extractData = (
   return data;
 };
 
-// /**
-//  * Mutate data extracted from a Google Sheets spreadsheet to make it compatible with the calculate function.
-//  *
-//  * @param {Object.<string, number|string>} data An object that contains the spreadsheet data
-//  */
-// const setupData = (data) => {
-//   const KEYS = [
-//     "dates",
-//     "bedtimeGoals",
-//     "bedtimes",
-//     "timesAsleep",
-//     "deeps",
-//     "rems",
-//   ];
-
-//   KEYS.forEach((key) => {
-//     data[key].forEach((val, i) => {
-//       data[key][i] = new Date(val);
-//     });
-//   });
-// };
-
 /**
  * Write scores into a Google Sheets spreadsheet.
  *
- * @param {string} sheetNameResult The name of the sheet that contains the results
- * @param {string} colScore A range for the score column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {Array.<number>} scores An array of scores to write into the score column
+ * @param {string} sheetNameResult Name of the sheet that contains the results
+ * @param {string} colScore Range for the score column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
+ * @param {Array.<number>} scores Scores to write into the score column
  */
 const writeScores = (sheetNameResult, colScore, scores) => {
   if (!sheetNameResult) {

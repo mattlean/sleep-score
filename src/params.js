@@ -5,8 +5,8 @@ import { createMoment } from "./util";
 /**
  * Get the bedtime ranges based off the bedtime goal.
  *
- * @param {Date} date The sleep session date
- * @param {Date} bedtimeGoal The bedtime goal on the corresponding date
+ * @param {Date} date Sleep session date
+ * @param {Date} bedtimeGoal Bedtime goal
  * @returns {Object.<string, moment.Moment>} An object that contains the start and end times for early, excellent, and fair bedtime ranges
  */
 export const getBedtimeRanges = (date, bedtimeGoal) => {
@@ -35,34 +35,34 @@ export const getBedtimeRanges = (date, bedtimeGoal) => {
 /**
  * Get the deep and REM thresholds for excellent and fair sleep.
  *
- * @param {moment.Duration} timeAsleepExcelGoalDuration The minimum threshold for excellent time asleep
- * @param {moment.Duration} timeAsleepFairGoalDuration The minimum threshold for fair time asleep
- * @param {moment.Duration} deepPercent The deep sleep percentage goal
- * @param {moment.Duration} remPercent The REM sleep percentage goal
+ * @param {moment.Duration} timeAsleepExcelThresholdDuration Moment.js duration threshold for excellent time asleep
+ * @param {moment.Duration} timeAsleepFairThresholdDuration Moment.js duration threshold for fair time asleep
+ * @param {moment.Duration} deepGoal Deep sleep percentage goal
+ * @param {moment.Duration} remGoal REM sleep percentage goal
  * @returns {Object.<string, moment.Duration>} An object that contains the deep and REM thresholds for excellent and fair sleep
  */
 export const getStageThresholds = (
-  timeAsleepExcelGoalDuration,
-  timeAsleepFairGoalDuration,
-  deepPercent,
-  remPercent,
+  timeAsleepExcelThresholdDuration,
+  timeAsleepFairThresholdDuration,
+  deepGoal,
+  remGoal,
 ) => {
   const stageThresholds = {};
 
-  stageThresholds.excelDeep = moment.duration({
-    minutes: timeAsleepExcelGoalDuration.asMinutes() * (deepPercent * 0.01),
+  stageThresholds.excelDeepThreshold = moment.duration({
+    minutes: timeAsleepExcelThresholdDuration.asMinutes() * (deepGoal * 0.01),
   });
 
-  stageThresholds.excelRem = moment.duration({
-    minutes: timeAsleepExcelGoalDuration.asMinutes() * (remPercent * 0.01),
+  stageThresholds.excelRemThreshold = moment.duration({
+    minutes: timeAsleepExcelThresholdDuration.asMinutes() * (remGoal * 0.01),
   });
 
-  stageThresholds.fairDeep = moment.duration({
-    minutes: timeAsleepFairGoalDuration.asMinutes() * (deepPercent * 0.01),
+  stageThresholds.fairDeepThreshold = moment.duration({
+    minutes: timeAsleepFairThresholdDuration.asMinutes() * (deepGoal * 0.01),
   });
 
-  stageThresholds.fairRem = moment.duration({
-    minutes: timeAsleepFairGoalDuration.asMinutes() * (remPercent * 0.01),
+  stageThresholds.fairRemThreshold = moment.duration({
+    minutes: timeAsleepFairThresholdDuration.asMinutes() * (remGoal * 0.01),
   });
 
   return stageThresholds;
