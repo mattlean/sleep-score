@@ -1,4 +1,6 @@
 /* global Logger */
+import moment from "moment";
+
 import { getBedtimeRanges, getStageThresholds } from "./params";
 import {
   convertGsheetsDurationToMomentDuration,
@@ -78,11 +80,11 @@ export const calculate = (
     throw new Error("Time asleep was not found.");
   }
 
-  if (!deep) {
+  if (deep === undefined) {
     throw new Error("Deep sleep was not found.");
   }
 
-  if (!rem) {
+  if (rem === undefined) {
     throw new Error("REM sleep was not found.");
   }
 
@@ -93,8 +95,10 @@ export const calculate = (
     convertGsheetsDurationToMomentDuration(timeAsleepFairThreshold);
   const timeAsleepPoorThresholdDuration =
     convertGsheetsDurationToMomentDuration(timeAsleepPoorThreshold);
-  const deepDuration = convertGsheetsDurationToMomentDuration(deep);
-  const remDuration = convertGsheetsDurationToMomentDuration(rem);
+  const deepDuration = deep
+    ? convertGsheetsDurationToMomentDuration(deep)
+    : null;
+  const remDuration = rem ? convertGsheetsDurationToMomentDuration(rem) : null;
 
   if (showLogs) {
     Logger.info("[ INIT PARAMS ]");
@@ -142,6 +146,7 @@ export const calculate = (
     excelRemThreshold,
     fairDeepThreshold,
     fairRemThreshold,
+    badStageThreshold,
   } = getStageThresholds(
     timeAsleepExcelThresholdDuration,
     timeAsleepFairThresholdDuration,
@@ -159,6 +164,23 @@ export const calculate = (
     Logger.info(outputMomentDuration(fairDeepThreshold));
     Logger.info("Fair REM:");
     Logger.info(outputMomentDuration(fairRemThreshold));
+  }
+
+  // Handle case where sleep did not occur
+  if (
+    date &&
+    bedtimeGoal === "" &&
+    timeAsleepExcelThreshold === "" &&
+    timeAsleepFairThreshold === "" &&
+    timeAsleepFairThreshold === "" &&
+    deepGoal === "" &&
+    remGoal === "" &&
+    bedtime === "" &&
+    timeAsleep === "" &&
+    deep === "" &&
+    rem === ""
+  ) {
+    return 0;
   }
 
   /* Grading T (Bedtime Grade) */
@@ -237,40 +259,60 @@ export const calculate = (
 
   let d = 0;
 
-  if (deepDuration >= excelDeepThreshold) {
+  if (moment.isDuration(deepDuration) && deepDuration >= excelDeepThreshold) {
     if (showLogs) {
       Logger.info("Excellent deep sleep: +50");
     }
     d += 50;
-  } else if (deepDuration >= fairDeepThreshold) {
+  } else if (
+    moment.isDuration(deepDuration) &&
+    deepDuration >= fairDeepThreshold
+  ) {
     if (showLogs) {
       Logger.info("Fair deep sleep: +40");
     }
     d += 40;
-  } else {
+  } else if (
+    moment.isDuration(deepDuration) &&
+    deepDuration >= badStageThreshold
+  ) {
     if (showLogs) {
       Logger.info("Bad deep sleep: +10");
     }
     d += 10;
+  } else {
+    if (showLogs) {
+      Logger.info("Fail deep sleep: +0");
+    }
   }
 
   let r = 0;
 
-  if (remDuration >= excelRemThreshold) {
+  if (moment.isDuration(remDuration) && remDuration >= excelRemThreshold) {
     if (showLogs) {
       Logger.info("Excellent REM sleep: +50");
     }
     r += 50;
-  } else if (remDuration >= fairRemThreshold) {
+  } else if (
+    moment.isDuration(remDuration) &&
+    remDuration >= fairRemThreshold
+  ) {
     if (showLogs) {
       Logger.info("Fair REM sleep: +40");
     }
     r += 40;
-  } else {
+  } else if (
+    moment.isDuration(remDuration) &&
+    remDuration >= badStageThreshold
+  ) {
     if (showLogs) {
       Logger.info("Bad REM sleep: +10");
     }
     r += 10;
+  } else {
+    if (showLogs) {
+      Logger.info("Fail REM sleep: +0");
+    }
   }
 
   Q = d + r;
@@ -326,50 +368,17 @@ export const calculateAll = (
   rems,
   showLogs,
 ) => {
-  // First output a score of 0 for cases where sleep did not occur
+  // Throw error when parameter arrays do not match in size
   if (
-    !dates &&
-    !bedtimeGoals &&
-    !timeAsleepExcelThresholds &&
-    !timeAsleepFairThresholds &&
-    !timeAsleepPoorThresholds &&
-    !deepGoals &&
-    !remGoals &&
-    !bedtimes &&
-    !timesAsleep &&
-    !deeps &&
-    !rems
-  ) {
-    return 0;
-  }
-
-  if (
-    dates.length == 0 &&
-    bedtimes.length === 0 &&
-    timeAsleepExcelThresholds.length === 0 &&
-    timeAsleepFairThresholds.length === 0 &&
-    timeAsleepPoorThresholds.length === 0 &&
-    deepGoals.length === 0 &&
-    remGoals.length === 0 &&
-    bedtimes.length === 0 &&
-    timesAsleep.length === 0 &&
-    deeps.length === 0 &&
-    rems.length === 0
-  ) {
-    return 0;
-  }
-
-  // Handle error with input data format
-  if (
-    dates.length !== bedtimes.length &&
-    dates.length !== timeAsleepExcelThresholds.length &&
-    dates.length !== timeAsleepFairThresholds.length &&
-    dates.length !== timeAsleepPoorThresholds.length &&
-    dates.length !== deepGoals.length &&
-    dates.length !== remGoals.length &&
-    dates.length !== bedtimes.length &&
-    dates.length !== timesAsleep.length &&
-    dates.length !== deeps.length &&
+    dates.length !== bedtimes.length ||
+    dates.length !== timeAsleepExcelThresholds.length ||
+    dates.length !== timeAsleepFairThresholds.length ||
+    dates.length !== timeAsleepPoorThresholds.length ||
+    dates.length !== deepGoals.length ||
+    dates.length !== remGoals.length ||
+    dates.length !== bedtimes.length ||
+    dates.length !== timesAsleep.length ||
+    dates.length !== deeps.length ||
     dates.length !== rems.length
   ) {
     throw new Error("Parameter arrays do not match in size.");

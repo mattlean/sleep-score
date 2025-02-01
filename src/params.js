@@ -33,13 +33,13 @@ export const getBedtimeRanges = (date, bedtimeGoal) => {
 };
 
 /**
- * Get the deep and REM thresholds for excellent and fair sleep.
+ * Get the deep and REM thresholds for excellent, fair, and bad sleep.
  *
  * @param {moment.Duration} timeAsleepExcelThresholdDuration Moment.js duration threshold for excellent time asleep
  * @param {moment.Duration} timeAsleepFairThresholdDuration Moment.js duration threshold for fair time asleep
  * @param {moment.Duration} deepGoal Deep sleep percentage goal
  * @param {moment.Duration} remGoal REM sleep percentage goal
- * @returns {Object.<string, moment.Duration>} An object that contains the deep and REM thresholds for excellent and fair sleep
+ * @returns {Object.<string, moment.Duration>} An object that contains the deep and REM thresholds for excellent, fair, and bad sleep
  */
 export const getStageThresholds = (
   timeAsleepExcelThresholdDuration,
@@ -50,20 +50,30 @@ export const getStageThresholds = (
   const stageThresholds = {};
 
   stageThresholds.excelDeepThreshold = moment.duration({
-    minutes: timeAsleepExcelThresholdDuration.asMinutes() * (deepGoal * 0.01),
+    minutes: Math.floor(
+      timeAsleepExcelThresholdDuration.asMinutes() * (deepGoal * 0.01),
+    ),
   });
 
   stageThresholds.excelRemThreshold = moment.duration({
-    minutes: timeAsleepExcelThresholdDuration.asMinutes() * (remGoal * 0.01),
+    minutes: Math.floor(
+      timeAsleepExcelThresholdDuration.asMinutes() * (remGoal * 0.01),
+    ),
   });
 
   stageThresholds.fairDeepThreshold = moment.duration({
-    minutes: timeAsleepFairThresholdDuration.asMinutes() * (deepGoal * 0.01),
+    minutes: Math.floor(
+      timeAsleepFairThresholdDuration.asMinutes() * (deepGoal * 0.01),
+    ),
   });
 
   stageThresholds.fairRemThreshold = moment.duration({
-    minutes: timeAsleepFairThresholdDuration.asMinutes() * (remGoal * 0.01),
+    minutes: Math.floor(
+      timeAsleepFairThresholdDuration.asMinutes() * (remGoal * 0.01),
+    ),
   });
+
+  stageThresholds.badStageThreshold = moment.duration({ minutes: 1 });
 
   return stageThresholds;
 };
