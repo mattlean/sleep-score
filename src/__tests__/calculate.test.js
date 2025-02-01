@@ -28,6 +28,20 @@ const SESSION_0223 = {
   rem: new Date("Sat Dec 30 1899 01:02:00 GMT-0800"),
 };
 
+const SESSION_0524 = {
+  date: new Date("Wed May 01 2024 00:00:00 GMT-0800"),
+  bedtimeGoal: new Date("Sat Dec 30 1899 00:15:00 GMT-0800"),
+  timeAsleepExcelThreshold: new Date("Sat Dec 30 1899 07:00:00 GMT-0800"),
+  timeAsleepFairThreshold: new Date("Sat Dec 30 1899 06:00:00 GMT-0800"),
+  timeAsleepPoorThreshold: new Date("Sat Dec 30 1899 03:00:00 GMT-0800"),
+  deepGoal: 15,
+  remGoal: 20,
+  bedtime: new Date("Sat Dec 30 1899 05:09:00 GMT-0800"),
+  timeAsleep: new Date("Sat Dec 30 1899 06:44:00 GMT-0800"),
+  deep: new Date("Sat Dec 30 1899 01:11:00 GMT-0800"),
+  rem: new Date("Sat Dec 30 1899 01:26:00 GMT-0800"),
+};
+
 const SESSION_NO_REM_DEEP = {
   date: new Date("Sat Feb 01 2025 00:00:00 GMT-0800"),
   bedtimeGoal: new Date("Sat Dec 30 1899 00:00:00 GMT-0800"),
@@ -145,6 +159,38 @@ describe("calculate", () => {
     expect(sleepScore).toBe(75);
   });
 
+  it("Date - 5/24, Bedtime Goal - 12:15 AM, Time Asleep Excellent Threshold - 7, Time Asleep Fair Threshold - 6, Time Asleep Poor Threshold - 3, Deep % Goal - 15, REM % Goal - 20, Bedtime - 5:09 AM, Time Asleep - 6:44, Deep - 1:11, REM - 1:26", () => {
+    const {
+      date,
+      bedtimeGoal,
+      timeAsleepExcelThreshold,
+      timeAsleepFairThreshold,
+      timeAsleepPoorThreshold,
+      deepGoal,
+      remGoal,
+      bedtime,
+      timeAsleep,
+      deep,
+      rem,
+    } = SESSION_0524;
+
+    const sleepScore = calculate(
+      date,
+      bedtimeGoal,
+      timeAsleepExcelThreshold,
+      timeAsleepFairThreshold,
+      timeAsleepPoorThreshold,
+      deepGoal,
+      remGoal,
+      bedtime,
+      timeAsleep,
+      deep,
+      rem,
+    );
+
+    expect(sleepScore).toBe(67);
+  });
+
   it("Example where Deep & REM were not measured\nDate - 2/25, Bedtime Goal - 12:00 AM, Time Asleep Excellent Threshold - 8, Time Asleep Fair Threshold - 6, Time Asleep Poor Threshold - 3, Deep % Goal - 15, REM % Goal - 20, Bedtime - 12:00 AM, Time Asleep - 2:30, Deep - 0:00, REM - 0:00", () => {
     const {
       date,
@@ -176,6 +222,24 @@ describe("calculate", () => {
 
     expect(sleepScore).toBe(64);
   });
+
+  it("Example where no sleep occurred", () => {
+    const sleepScore = calculate(
+      new Date("Sat Feb 01 2025 00:00:00 GMT-0800"),
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    );
+
+    expect(sleepScore).toBe(0);
+  });
 });
 
 describe("calculateAll", () => {
@@ -192,7 +256,12 @@ describe("calculateAll", () => {
       timesAsleep,
       deeps,
       rems,
-    } = buildData(SESSION_0125, SESSION_0223, SESSION_NO_REM_DEEP);
+    } = buildData(
+      SESSION_0125,
+      SESSION_0223,
+      SESSION_0524,
+      SESSION_NO_REM_DEEP,
+    );
 
     const scores = calculateAll(
       dates,
@@ -208,10 +277,11 @@ describe("calculateAll", () => {
       rems,
     );
 
-    expect(scores.length).toBe(3);
+    expect(scores.length).toBe(4);
     expect(scores[0]).toBe(81);
     expect(scores[1]).toBe(75);
-    expect(scores[2]).toBe(64);
+    expect(scores[2]).toBe(67);
+    expect(scores[3]).toBe(64);
   });
 
   it("calculates one session and return a score for it", () => {

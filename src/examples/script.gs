@@ -1,6 +1,4 @@
-function main2023() {
-  Logger.info("Executing script for 2023...");
-
+function main() {
   const {
     dates,
     bedtimeGoals,
@@ -14,7 +12,7 @@ function main2023() {
     deeps,
     rems,
   } = extractData(
-    "2023 Params",
+    "params",
     "A2:A11",
     "B2:B11",
     "C2:C11",
@@ -22,7 +20,7 @@ function main2023() {
     "E2:E11",
     "F2:F11",
     "G2:G11",
-    "2023",
+    "results",
     "B2:B11",
     "C2:C11",
     "E2:E11",
@@ -43,7 +41,5 @@ function main2023() {
     rems,
   );
 
-  Logger.info("[ 2023 SCORES ] ");
-  Logger.info(scores);
-  writeScores("2023", "I2:I11", scores);
+  writeScores("results", "I2:I11", scores);
 }

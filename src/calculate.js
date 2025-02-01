@@ -48,35 +48,35 @@ export const calculate = (
     throw new Error("Date was not found.");
   }
 
-  if (!bedtimeGoal) {
+  if (bedtimeGoal === undefined) {
     throw new Error("Bedtime goal was not found.");
   }
 
-  if (!timeAsleepExcelThreshold) {
+  if (timeAsleepExcelThreshold === undefined) {
     throw new Error("Excellent time asleep minimum was not found.");
   }
 
-  if (!timeAsleepFairThreshold) {
+  if (timeAsleepFairThreshold === undefined) {
     throw new Error("Fair time asleep minimum was not found.");
   }
 
-  if (!timeAsleepPoorThreshold) {
+  if (timeAsleepPoorThreshold === undefined) {
     throw new Error("Poor time asleep minimum was not found.");
   }
 
-  if (!deepGoal) {
+  if (deepGoal === undefined) {
     throw new Error("Deep sleep percentage goal was not found.");
   }
 
-  if (!remGoal) {
+  if (remGoal === undefined) {
     throw new Error("REM sleep percentage goal was not found.");
   }
 
-  if (!bedtime) {
+  if (bedtime === undefined) {
     throw new Error("Bedtime was not found.");
   }
 
-  if (!timeAsleep) {
+  if (timeAsleep === undefined) {
     throw new Error("Time asleep was not found.");
   }
 
@@ -88,13 +88,18 @@ export const calculate = (
     throw new Error("REM sleep was not found.");
   }
 
-  const timeAsleepDuration = convertGsheetsDurationToMomentDuration(timeAsleep);
-  const timeAsleepExcelThresholdDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepExcelThreshold);
-  const timeAsleepFairThresholdDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepFairThreshold);
-  const timeAsleepPoorThresholdDuration =
-    convertGsheetsDurationToMomentDuration(timeAsleepPoorThreshold);
+  const timeAsleepDuration = timeAsleep
+    ? convertGsheetsDurationToMomentDuration(timeAsleep)
+    : null;
+  const timeAsleepExcelThresholdDuration = timeAsleepExcelThreshold
+    ? convertGsheetsDurationToMomentDuration(timeAsleepExcelThreshold)
+    : null;
+  const timeAsleepFairThresholdDuration = timeAsleepFairThreshold
+    ? convertGsheetsDurationToMomentDuration(timeAsleepFairThreshold)
+    : null;
+  const timeAsleepPoorThresholdDuration = timeAsleepPoorThreshold
+    ? convertGsheetsDurationToMomentDuration(timeAsleepPoorThreshold)
+    : null;
   const deepDuration = deep
     ? convertGsheetsDurationToMomentDuration(deep)
     : null;
@@ -123,6 +128,23 @@ export const calculate = (
     );
     Logger.info(`Deep: ${deep} (${outputMomentDuration(deepDuration)})`);
     Logger.info(`REM: ${rem} (${outputMomentDuration(remDuration)})`);
+  }
+
+  // Handle case where sleep did not occur
+  if (
+    date &&
+    bedtimeGoal === "" &&
+    timeAsleepExcelThreshold === "" &&
+    timeAsleepFairThreshold === "" &&
+    timeAsleepFairThreshold === "" &&
+    deepGoal === "" &&
+    remGoal === "" &&
+    bedtime === "" &&
+    timeAsleep === "" &&
+    deep === "" &&
+    rem === ""
+  ) {
+    return 0;
   }
 
   const { earlyStart, earlyEnd, excelStart, excelEnd, fairStart, fairEnd } =
@@ -164,23 +186,6 @@ export const calculate = (
     Logger.info(outputMomentDuration(fairDeepThreshold));
     Logger.info("Fair REM:");
     Logger.info(outputMomentDuration(fairRemThreshold));
-  }
-
-  // Handle case where sleep did not occur
-  if (
-    date &&
-    bedtimeGoal === "" &&
-    timeAsleepExcelThreshold === "" &&
-    timeAsleepFairThreshold === "" &&
-    timeAsleepFairThreshold === "" &&
-    deepGoal === "" &&
-    remGoal === "" &&
-    bedtime === "" &&
-    timeAsleep === "" &&
-    deep === "" &&
-    rem === ""
-  ) {
-    return 0;
   }
 
   /* Grading T (Bedtime Grade) */

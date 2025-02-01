@@ -11,7 +11,7 @@
  * @param {string} colTimeAsleepPoorThreshold Range for the time asleep poor threshold column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {string} colDeepGoal Range for the deep sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {string} colRemGoal Range for the REM sleep percentage goal column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
- * @param {string} sheetNameResult The name of the sheet that contains the results
+ * @param {string} sheetNameResults The name of the sheet that contains the results
  * @param {string} colBedtime Range for the bedtime column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {string} colTimeAsleep Range for the time asleep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {string} colDeep Range for the deep column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
@@ -27,7 +27,7 @@ const extractData = (
   colTimeAsleepPoorThreshold,
   colDeepGoal,
   colRemGoal,
-  sheetNameResult,
+  sheetNameResults,
   colBedtime,
   colTimeAsleep,
   colDeep,
@@ -65,7 +65,7 @@ const extractData = (
     throw new Error("Column for REM sleep goal percentage was not set.");
   }
 
-  if (!sheetNameResult) {
+  if (!sheetNameResults) {
     throw new Error("Name for the result sheet was not set.");
   }
 
@@ -85,9 +85,9 @@ const extractData = (
     throw new Error("Column for REM stage was not set.");
   }
 
-  const sheetResult =
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetNameResult);
-  if (sheetResult === null) {
+  const sheetResults =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetNameResults);
+  if (sheetResults === null) {
     throw new Error("Result sheet was not found.");
   }
 
@@ -115,10 +115,10 @@ const extractData = (
     .flat();
   data.deepGoals = sheetParams.getRange(colDeepGoal).getValues().flat();
   data.remGoals = sheetParams.getRange(colRemGoal).getValues().flat();
-  data.bedtimes = sheetResult.getRange(colBedtime).getValues().flat();
-  data.timesAsleep = sheetResult.getRange(colTimeAsleep).getValues().flat();
-  data.deeps = sheetResult.getRange(colDeep).getValues().flat();
-  data.rems = sheetResult.getRange(colRem).getValues().flat();
+  data.bedtimes = sheetResults.getRange(colBedtime).getValues().flat();
+  data.timesAsleep = sheetResults.getRange(colTimeAsleep).getValues().flat();
+  data.deeps = sheetResults.getRange(colDeep).getValues().flat();
+  data.rems = sheetResults.getRange(colRem).getValues().flat();
 
   return data;
 };
@@ -126,18 +126,18 @@ const extractData = (
 /**
  * Write scores into a Google Sheets spreadsheet.
  *
- * @param {string} sheetNameResult Name of the sheet that contains the results
+ * @param {string} sheetNameResults Name of the sheet that contains the results
  * @param {string} colScore Range for the score column as specified in A1 notation or R1C1 notation (https://developers.google.com/apps-script/reference/spreadsheet/spreadsheet#getrangea1notation)
  * @param {Array.<number>} scores Scores to write into the score column
  */
-const writeScores = (sheetNameResult, colScore, scores) => {
-  if (!sheetNameResult) {
+const writeScores = (sheetNameResults, colScore, scores) => {
+  if (!sheetNameResults) {
     throw new Error("Name for the result sheet was not set.");
   }
 
-  const sheetResult =
-    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetNameResult);
-  if (sheetResult === null) {
+  const sheetResults =
+    SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetNameResults);
+  if (sheetResults === null) {
     throw new Error("Result sheet was not found.");
   }
 
@@ -148,5 +148,5 @@ const writeScores = (sheetNameResult, colScore, scores) => {
     return accumulator;
   }, []);
 
-  sheetResult.getRange(colScore).setValues(values);
+  sheetResults.getRange(colScore).setValues(values);
 };
