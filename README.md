@@ -187,3 +187,7 @@ After taking the ceiling of $Q$, we get a sleep score of $81$ which is considere
 - Factor in sleep efficiency: time asleep percentage of total time in bed, and number of sleep sessions.
 - Factor in heart rate like [Fitbit's restoration metric](https://support.google.com/fitbit/answer/14236513?hl=en#zippy=%2Chow-is-my-sleep-score-calculated-in-the-fitbit-app) under quality of sleep.
 - Incorporate elements commonly used in readiness and recovery scores like HRV.
+
+# Built with Lean JS App Starter
+
+This was created with [Lean JavaScript Application Starter](https://github.com/mattlean/lean-js-app-starter).
