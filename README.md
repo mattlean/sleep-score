@@ -4,11 +4,13 @@ This is a fun little personal sleep score project made to help improve my sleep.
 
 I've always had a really hard time getting to sleep and staying asleep due to health reasons, so I require a lot more effort in getting a good night's rest when compared to normal people.
 
-This algorithm uses data collected by a sleep tracking device to calculate sleep scores based on user set goals. This calculation can be run for a particular day, week, month, etc. It is generic, so it isn't tied to any particular brand of device, but I use a Fitbit brand device at the moment.
+This algorithm uses data collected by a sleep tracking device to calculate sleep scores based on user set goals. This calculation can be run for a particular day, week, month, etc. It is generic, so it isn't tied to any specific brand of device, but I personally use a Fitbit. It only requires the device that tracks bedtime, time asleep, and sleep stage durations.
 
-Fitbit already has a sleep score feature that works well for most people, but I find it a bit too generous for my scenario, although that makes sense since it needs to work for extremely large demographic.
+At the moment the calculation is performed through [Google Sheets](https://workspace.google.com/products/sheets) using [Apps Script](https://developers.google.com/sheets), but the code can be easily adapted to work without it. All of the Apps Script-specific functionality is separated into its own file in [`gsheets.gs`](./src/gsheets.gs).
 
-Unfortunately I don't currently have what is considered to be a normal sleep pattern, so I need a sleep score that follows a stricter ruleset but can also be adjusted each time it is run. This score may potentially stress out some people, but I am usually not negatively stressed by bad health metrics, and I personally feel more motivated to improve when I understand them.
+Fitbit already has a sleep score feature that works well for most people, but I find it a bit too generous for my scenario, although that makes sense since it needs to work for an extremely large demographic.
+
+Unfortunately I don't currently have what is considered to be a normal sleep pattern, so I need a sleep score that follows a stricter ruleset while allowing for adjustments each time the calculation is run. The way the score works may potentially stress out some people, but I am not usually troubled by bad health metrics. Personally, I feel more motivated to improve when I understand them.
 
 # Calculation
 
