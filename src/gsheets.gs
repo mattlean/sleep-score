@@ -1,5 +1,3 @@
-/* global SpreadsheetApp */
-
 /**
  * Extract data from a Google Sheets spreadsheet.
  *

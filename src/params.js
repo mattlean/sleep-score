@@ -4,6 +4,8 @@ import { createMoment } from "./util";
 
 /**
  * Get the bedtime ranges based off the bedtime goal.
+ * Note that when this is run on a day where daylight savings begins, an additional
+ * hour can be potentially added to some windows.
  *
  * @param {Date} date Sleep session date
  * @param {Date} bedtimeGoal Bedtime goal

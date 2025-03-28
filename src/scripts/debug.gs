@@ -1,7 +1,11 @@
-function main2025() {
-  Logger.info("Executing script for 2025...");
+function debug() {
+  const sheetNameParams = "2025 Params";
+  const sheetNameResults = "2025";
+  const rowNum = "11";
 
-  const endRow = "12";
+  Logger.info(
+    `Executing debug script for row ${rowNum} in ${sheetNameResults}...`,
+  );
 
   const {
     dates,
@@ -16,19 +20,19 @@ function main2025() {
     deeps,
     rems,
   } = extractData(
-    "2025 Params",
-    `A2:A${endRow}`,
-    `B2:B${endRow}`,
-    `C2:C${endRow}`,
-    `D2:D${endRow}`,
-    `E2:E${endRow}`,
-    `F2:F${endRow}`,
-    `G2:G${endRow}`,
-    "2025",
-    `B2:B${endRow}`,
-    `C2:C${endRow}`,
-    `E2:E${endRow}`,
-    `F2:F${endRow}`,
+    sheetNameParams,
+    `A${rowNum}`,
+    `B${rowNum}`,
+    `C${rowNum}`,
+    `D${rowNum}`,
+    `E${rowNum}`,
+    `F${rowNum}`,
+    `G${rowNum}`,
+    sheetNameResults,
+    `B${rowNum}`,
+    `C${rowNum}`,
+    `E${rowNum}`,
+    `F${rowNum}`,
   );
 
   const scores = calculateAll(
@@ -43,9 +47,9 @@ function main2025() {
     timesAsleep,
     deeps,
     rems,
+    true,
   );
 
-  Logger.info("[ 2025 SCORES ] ");
+  Logger.info("[ DEBUGGING ] ");
   Logger.info(scores);
-  writeScores("2025", `I2:I${endRow}`, scores);
 }
